@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Demostracion API</title>
+	</head>
+	<body>
+		<h1>Prueba API</h1>
+		<label for="amount">Ingrese un monto:</label>
+		<input type="number" id="amount" />
+		<button onclick="calculateChange()">Calcular cambio</button>
+		<div id="result"></div>
+
+		<script>
+			function calculateChange() {
+				const amountInput = document.getElementById("amount");
+				const amount = amountInput.value;
+
+				fetch("/api", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({ monto: amount }),
+				})
+					.then((response) => response.json())
+					.then((data) => {
+						const resultDiv = document.getElementById("result");
+						resultDiv.innerHTML = "";
+
+						if (
+							data.cambioMonedas &&
+							data.cambioMonedas.length > 0
+						) {
+							data.cambioMonedas.forEach((moneda) => {
+								const monedaDiv = document.createElement("div");
+								monedaDiv.textContent = `${moneda.cantidad} x ${moneda.moneda}`;
+								resultDiv.appendChild(monedaDiv);
+							});
+						} else {
+							const errorDiv = document.createElement("div");
+							errorDiv.textContent = "No change available.";
+							resultDiv.appendChild(errorDiv);
+						}
+					})
+					.catch((error) => {
+						console.error("Error:", error);
+					});
+			}
+		</script>
+	</body>
+</html>
